@@ -10,40 +10,79 @@ window.addEventListener('load', function() {
     canvas.height = window.innerHeight;
     var centerX = canvas.width / 2;
     var centerY = canvas.height / 2;
+    //var maxDistance = Math.sqrt(centerX * centerX + centerY * centerY);
     var maxDistance = Math.min(canvas.width, canvas.height) / 2;
     //draw();
-    window.setTimeout(function() {
-        perlinNoise = new PerlinNoise({"width": canvas.width, "height": canvas.height});
-        for (var x = 0; x < canvas.width; x++) {
-            for (var y = 0; y < canvas.height; y++) {
-                window.setTimeout((function(x, y) {
-                    return function() {
-                        var zoom = 2;
-                        var dx = x - centerX;
-                        var dy = y - centerY;
-                        var distanceFromCenter = Math.sqrt(dx * dx + dy * dy);
-                        var intensity = (perlinNoise.getIntensityAt(x / (zoom * 4), y / (zoom * 4)) / 50 + 1) * 
-                                        (perlinNoise.getIntensityAt(x / (zoom * 20), y / (zoom * 20)) / 10 + 1) * 
-                                        (perlinNoise.getIntensityAt(x / (zoom * 100), y / (zoom * 100)) + 1) *
-                                        (perlinNoise.getIntensityAt(x / (zoom * 200), y / (zoom * 200)) + 1) 
-                                        * fade((maxDistance - distanceFromCenter) / maxDistance);
 
-
-                        if (intensity > 1) {
-                            //intensity = intensity * 255 / 2.0;
-                            intensity = 200;
-                        } else if (intensity > 0.75) {
-                            intensity = 100;
-                        } else {
-                            intensity = 0;
-                        }
-                        ctx.fillStyle = rgbToHex(intensity, intensity, intensity);
-                        ctx.fillRect(x, y, 1, 1);
+    perlinNoise = new PerlinNoise({"width": canvas.width, "height": canvas.height});
+    for (var x = 0; x < canvas.width; x += 20) {
+        for (var y = 0; y < canvas.height; y += 20) {
+            window.setTimeout((function(x, y) {
+                return function() {
+                    var zoom = 2;
+                    var dx = x - centerX;
+                    var dy = y - centerY;
+                    var distanceFromCenter = Math.sqrt(dx * dx + dy * dy);
+                    
+                    var intensity;
+                    if (distanceFromCenter >= maxDistance) {
+                        intensity = 0;
+                    } else {
+                        intensity = (perlinNoise.getIntensityAt(x / (zoom * 4), y / (zoom * 4)) / 50 + 1) * 
+                                    (perlinNoise.getIntensityAt(x / (zoom * 20), y / (zoom * 20)) / 10 + 1) * 
+                                    (perlinNoise.getIntensityAt(x / (zoom * 100), y / (zoom * 100)) + 1) *
+                                    (perlinNoise.getIntensityAt(x / (zoom * 200), y / (zoom * 200)) + 1) 
+                                    * fade((maxDistance - distanceFromCenter) / maxDistance);
                     }
-                }) (x, y), 1);
-            }
+                    
+                    if (intensity > 1) {
+                        //intensity = intensity * 255 / 2.0;
+                        intensity = 200;
+                    } else if (intensity > 0.75) {
+                        intensity = 100;
+                    } else {
+                        intensity = 0;
+                    }
+                    ctx.fillStyle = rgbToHex(intensity, intensity, intensity);
+                    ctx.fillRect(x, y, 20, 20);
+                }
+            }) (x, y), 1);
         }
-    }, 0);
+    }
+    for (var x = 0; x < canvas.width; x += 1) {
+        for (var y = 0; y < canvas.height; y += 1) {
+            window.setTimeout((function(x, y) {
+                return function() {
+                    var zoom = 2;
+                    var dx = x - centerX;
+                    var dy = y - centerY;
+                    var distanceFromCenter = Math.sqrt(dx * dx + dy * dy);
+                    
+                    var intensity;
+                    if (distanceFromCenter >= maxDistance) {
+                        intensity = 0;
+                    } else {
+                        intensity = (perlinNoise.getIntensityAt(x / (zoom * 4), y / (zoom * 4)) / 50 + 1) * 
+                                    (perlinNoise.getIntensityAt(x / (zoom * 20), y / (zoom * 20)) / 10 + 1) * 
+                                    (perlinNoise.getIntensityAt(x / (zoom * 100), y / (zoom * 100)) + 1) *
+                                    (perlinNoise.getIntensityAt(x / (zoom * 200), y / (zoom * 200)) + 1) 
+                                    * fade((maxDistance - distanceFromCenter) / maxDistance);
+                    }
+                    
+                    if (intensity > 1) {
+                        //intensity = intensity * 255 / 2.0;
+                        intensity = 200;
+                    } else if (intensity > 0.75) {
+                        intensity = 100;
+                    } else {
+                        intensity = 0;
+                    }
+                    ctx.fillStyle = rgbToHex(intensity, intensity, intensity);
+                    ctx.fillRect(x, y, 1, 1);
+                }
+            }) (x, y), 1);
+        }
+    }
     //perlinNoise.draw(ctx);
     console.log("done!");
     //window.addEventListener('mousemove', onMouseMove, false);
