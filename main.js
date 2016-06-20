@@ -39,9 +39,9 @@ window.addEventListener('load', function() {
                         //intensity = intensity * 255 / 2.0;
                         ctx.fillStyle = rgbToHex(100, 200, 100);
                     } else if (intensity > 0.75) {
-                        ctx.fillStyle = rgbToHex(200, 200, 255);
+                        ctx.fillStyle = rgbToHex(50, 50, 70);
                     } else {
-                        ctx.fillStyle = rgbToHex(10, 10, 50);
+                        ctx.fillStyle = rgbToHex(10, 10, 20);
                     }
                     
 
@@ -74,9 +74,9 @@ window.addEventListener('load', function() {
                         //intensity = intensity * 255 / 2.0;
                         ctx.fillStyle = rgbToHex(100, 200, 100);
                     } else if (intensity > 0.75) {
-                        ctx.fillStyle = rgbToHex(200, 200, 255);
+                        ctx.fillStyle = rgbToHex(50, 50, 70);
                     } else {
-                        ctx.fillStyle = rgbToHex(10, 10, 50);
+                        ctx.fillStyle = rgbToHex(10, 10, 20);
                     }
                     
                     ctx.fillRect(x, y, 1, 1);
