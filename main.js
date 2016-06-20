@@ -37,13 +37,14 @@ window.addEventListener('load', function() {
                     
                     if (intensity > 1) {
                         //intensity = intensity * 255 / 2.0;
-                        intensity = 200;
+                        ctx.fillStyle = rgbToHex(100, 200, 100);
                     } else if (intensity > 0.75) {
-                        intensity = 100;
+                        ctx.fillStyle = rgbToHex(200, 200, 255);
                     } else {
-                        intensity = 0;
+                        ctx.fillStyle = rgbToHex(10, 10, 50);
                     }
-                    ctx.fillStyle = rgbToHex(intensity, intensity, intensity);
+                    
+
                     ctx.fillRect(x, y, 20, 20);
                 }
             }) (x, y), 1);
@@ -71,13 +72,13 @@ window.addEventListener('load', function() {
                     
                     if (intensity > 1) {
                         //intensity = intensity * 255 / 2.0;
-                        intensity = 200;
+                        ctx.fillStyle = rgbToHex(100, 200, 100);
                     } else if (intensity > 0.75) {
-                        intensity = 100;
+                        ctx.fillStyle = rgbToHex(200, 200, 255);
                     } else {
-                        intensity = 0;
+                        ctx.fillStyle = rgbToHex(10, 10, 50);
                     }
-                    ctx.fillStyle = rgbToHex(intensity, intensity, intensity);
+                    
                     ctx.fillRect(x, y, 1, 1);
                 }
             }) (x, y), 1);
