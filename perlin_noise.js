@@ -1,24 +1,12 @@
 function PerlinNoise(args) {
     this.width = args.width;
     this.height = args.height;
-    this.cellWidth = args.cellWidth;
-    this.cellHeight = args.cellHeight;
+    this.cellWidth = 1.1;
+    this.cellHeight = 1.1;
     this.grid = [];
 
     this.regenerate();
-    //This norm factor will be calculated more intelligently
-    //in the future.
-    this.normFactor = 0;
-    for (var x = 0; x < this.width; x++) {
-        for (var y = 0; y < this.height; y++) {
-            var intensity = Math.abs(this.getIntensityAt(x, y));
-            if (intensity > this.normFactor) {
-                this.normFactor = intensity;
-            }
-        }
-    }
 }
-
 
 PerlinNoise.prototype.draw = function(ctx) {
     for (var i = 0; i < this.grid.length; i++) {
@@ -44,10 +32,6 @@ PerlinNoise.prototype.regenerate = function() {
             this.grid[i].push(gradient);
         }
     }
-}
-
-PerlinNoise.prototype.getNormIntensity = function(x, y) {
-    return this.getIntensityAt(x, y) / this.normFactor;
 }
 
 PerlinNoise.prototype.getIntensityAt = function(x, y) {
