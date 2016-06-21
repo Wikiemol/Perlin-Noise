@@ -39,41 +39,85 @@ IslandGenerator.prototype.getLandType = function(x, y) {
     return null;
 }
 
-IslandGenerator.prototype.draw = function(ctx) {
+IslandGenerator.prototype.draw = function(ctx, onDone) {
     var cellWidth = 20;
     var cellHeight = 20;
-    var cellTypes = this.scout(ctx, cellWidth, cellHeight);
-    var cellsDrawn = 0;
-    for (var cellY = 0; cellY < cellTypes.length; cellY++) {
-        for (var cellX = 0; cellX < cellTypes[cellY].length; cellX++) {
-            var color1 = cellTypes[cellX][cellY]
-            var color2 = cellTypes[cellX + 1][cellY];
-            var color3 = cellTypes[cellX + 1][cellY + 1];
-            var color4 = cellTypes[cellX][cellY + 1];
-            if (color1 != color2 || color1 != color3 || color1 != color4) {
-                for (var x = cellX * cellWidth; x < cellX * cellWidth + cellWidth; x++) {
-                    for (var y = cellY * cellHeight; y < cellY * cellHeight + cellHeight; y++) {
-                        console.log(x, y);
-                        ctx.fillStyle = this.getLandType(x, y);
-                        ctx.fillRect(x, y, 1, 1);
-                    }
-                }
+    this.scout(ctx, cellWidth, cellHeight, function(cellTypes) {
+        var cellsDrawn = 0;
+        for (var cellY = 0; cellY < cellTypes.length; cellY++) {
+            for (var cellX = 0; cellX < cellTypes[cellY].length; cellX++) {
+                setTimeout((function(cellY, cellX) {
+                    return function() {
+                        var color1 = cellTypes[cellY][cellX]
+                        
+                        var color2;
+                        if (cellY + 1 >= cellTypes.length) {
+                            color2 = IslandGenerator.LandType.DEEP_WATER;
+                        } else {
+                            color2 = cellTypes[cellY + 1][cellX];
+                        }
+                        var color3;
+                        if (cellY + 1 >= cellTypes.length || cellX + 1 >= cellTypes[0].length) {
+                            color3 = IslandGenerator.LandType.DEEP_WATER;
+                        } else {
+                            color3 = cellTypes[cellY + 1][cellX + 1];
+                        }
+                        var color4;
+                        if (cellX + 1 > cellTypes[0].length) {
+                            color4 = IslandGenerator.LandType.DEEP_WATER;
+                        } else {
+                            color4 = cellTypes[cellY][cellX + 1];
+                        }
+                        
+                        if (color1 != color2 || color1 != color3 || color1 != color4) {
+                            for (var x = cellX * cellWidth; x < cellX * cellWidth + cellWidth; x++) {
+                                for (var y = cellY * cellHeight; y < cellY * cellHeight + cellHeight; y++) {
+                                    ctx.fillStyle = this.getLandType(x, y);
+                                    ctx.fillRect(x, y, 1, 1);
+                                }
+                            }
+                        } else {
+                            //ctx.fillStyle = cellTypes[cellY][cellX];
+                            //ctx.fillRect(cellX * cellWidth, cellY * cellHeight, cellWidth, cellHeight);
+                        }
+                        cellsDrawn++;
+                        if (cellsDrawn >= cellTypes.length * cellTypes[0].length) {
+                            onDone();
+                        }
+                    }.bind(this);
+                }.bind(this))(cellY, cellX), 0);
+                
             }
         }
-    }
+    }.bind(this));
+    
 }
 
-IslandGenerator.prototype.scout = function(ctx, cellWidth, cellHeight) {
+IslandGenerator.prototype.scout = function(ctx, cellWidth, cellHeight, onDone) {
+    var gridHeight = Math.floor(this.height / cellHeight);
+    var gridWidth = Math.floor(this.width / cellWidth);
     var cellTypes = [];
-    for (var cellY = 0; cellY < Math.floor(this.height / cellHeight); cellY++) {
+    var scouted = 0;
+    for (var cellY = 0; cellY < gridHeight; cellY++) {
         cellTypes.push([]);
-        for (var cellX = 0; cellX < Math.floor(this.width / cellWidth); cellX++) {
-            var x = cellWidth * cellX;
-            var y = cellHeight * cellY;
-            cellTypes.push(this.getLandType(x, y));
+        for (var cellX = 0; cellX < gridWidth; cellX++) {
+            setTimeout((function(cellY, cellX) {
+                return function() {
+                    var x = cellWidth * cellX;
+                    var y = cellHeight * cellY;
+                    var landColor = this.getLandType(x, y);
+                    cellTypes[cellY][cellX] = landColor;
+                    ctx.fillStyle = landColor;
+                    ctx.fillRect(x, y, cellWidth, cellHeight);
+                    scouted++;
+                    if (scouted >= gridHeight * gridWidth && onDone != null) {
+                        onDone(cellTypes);
+                    }
+                }.bind(this);
+            }.bind(this))(cellY, cellX), 0);
+
         }
     }
-    return cellTypes;
 }
 
 IslandGenerator.fade = function(x) {
