@@ -14,76 +14,43 @@ window.addEventListener('load', function() {
     var maxDistance = Math.min(canvas.width, canvas.height) / 2;
     //draw();
 
-    perlinNoise = new PerlinNoise({"width": canvas.width, "height": canvas.height});
-    for (var x = 0; x < canvas.width; x += 20) {
-        for (var y = 0; y < canvas.height; y += 20) {
+    var island_generator = new IslandGenerator({"width": canvas.width, "height": canvas.height});
+    island_generator.draw(ctx);
+    /*
+    console.log(IslandGenerator.LandType.DEEP_WATER);
+    for (var x = 0; x < canvas.width; x += 50) {
+        for (var y = 0; y < canvas.height; y += 50) {
             window.setTimeout((function(x, y) {
                 return function() {
-                    var zoom = 2;
-                    var dx = x - centerX;
-                    var dy = y - centerY;
-                    var distanceFromCenter = Math.sqrt(dx * dx + dy * dy);
-                    
-                    var intensity;
-                    if (distanceFromCenter >= maxDistance) {
-                        intensity = 0;
-                    } else {
-                        intensity = (perlinNoise.getIntensityAt(x / (zoom * 4), y / (zoom * 4)) / 50 + 1) * 
-                                    (perlinNoise.getIntensityAt(x / (zoom * 20), y / (zoom * 20)) / 10 + 1) * 
-                                    (perlinNoise.getIntensityAt(x / (zoom * 100), y / (zoom * 100)) + 1) *
-                                    (perlinNoise.getIntensityAt(x / (zoom * 200), y / (zoom * 200)) + 1) 
-                                    * fade((maxDistance - distanceFromCenter) / maxDistance);
-                    }
-                    
-                    if (intensity > 1) {
-                        //intensity = intensity * 255 / 2.0;
-                        ctx.fillStyle = rgbToHex(100, 200, 100);
-                    } else if (intensity > 0.75) {
-                        ctx.fillStyle = rgbToHex(50, 50, 70);
-                    } else {
-                        ctx.fillStyle = rgbToHex(10, 10, 20);
-                    }
-                    
+                    var landType = island_generator.getLandType(x, y);
 
-                    ctx.fillRect(x, y, 20, 20);
+                        ctx.fillStyle = landType;
+                    ctx.fillRect(x, y, 50, 50);
                 }
-            }) (x, y), 1);
+            }(x, y)), 0);
+            
         }
     }
-    for (var x = 0; x < canvas.width; x += 1) {
-        for (var y = 0; y < canvas.height; y += 1) {
+    for (var x = 0; x < canvas.width; x += 10) {
+        for (var y = 0; y < canvas.height; y += 10) {
             window.setTimeout((function(x, y) {
                 return function() {
-                    var zoom = 2;
-                    var dx = x - centerX;
-                    var dy = y - centerY;
-                    var distanceFromCenter = Math.sqrt(dx * dx + dy * dy);
-                    
-                    var intensity;
-                    if (distanceFromCenter >= maxDistance) {
-                        intensity = 0;
-                    } else {
-                        intensity = (perlinNoise.getIntensityAt(x / (zoom * 4), y / (zoom * 4)) / 50 + 1) * 
-                                    (perlinNoise.getIntensityAt(x / (zoom * 20), y / (zoom * 20)) / 10 + 1) * 
-                                    (perlinNoise.getIntensityAt(x / (zoom * 100), y / (zoom * 100)) + 1) *
-                                    (perlinNoise.getIntensityAt(x / (zoom * 200), y / (zoom * 200)) + 1) 
-                                    * fade((maxDistance - distanceFromCenter) / maxDistance);
-                    }
-                    
-                    if (intensity > 1) {
+                    var landType = island_generator.getLandType(x, y);
+                    if (landType == IslandGenerator.LandType.LAND) {
                         //intensity = intensity * 255 / 2.0;
-                        ctx.fillStyle = rgbToHex(100, 200, 100);
-                    } else if (intensity > 0.75) {
-                        ctx.fillStyle = rgbToHex(50, 50, 70);
+                        ctx.fillStyle = IslandGenerator.rgbToHex(100, 200, 100);
+                    } else if (landType == IslandGenerator.LandType.SHALLOW_WATER) {
+                        ctx.fillStyle = IslandGenerator.rgbToHex(50, 50, 70);
                     } else {
-                        ctx.fillStyle = rgbToHex(10, 10, 20);
+                        ctx.fillStyle = IslandGenerator.rgbToHex(10, 10, 20);
                     }
-                    
-                    ctx.fillRect(x, y, 1, 1);
+                    ctx.fillRect(x, y, 10, 10);
                 }
-            }) (x, y), 1);
+            }(x, y)), 0);
+            
         }
     }
+    */
     //perlinNoise.draw(ctx);
     console.log("done!");
     //window.addEventListener('mousemove', onMouseMove, false);
@@ -93,6 +60,7 @@ function fade(x) {
     var result = - Math.pow((- Math.cos(Math.PI * (x - 1)) / 2.0 + 0.5), 20) + 1;
     return result;
 }
+
 function onMouseMove(e) {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
     ctx.strokeStyle = "#000000";
@@ -102,14 +70,6 @@ function onMouseMove(e) {
     console.log(intensity);
 }
 
-function componentToHex(c) {
-    var hex = c.toString(16);
-    return hex.length == 1 ? "0" + hex : hex;
-}
-
-function rgbToHex(r, g, b) {
-    return "#" + componentToHex(r) + componentToHex(g) + componentToHex(b);
-}
 /*
 window.addEventListener('resize', function() {
     draw();
