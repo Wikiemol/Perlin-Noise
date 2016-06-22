@@ -5,7 +5,7 @@ function PerlinNoise(args) {
     this.cellHeight = 1.1;
     this.grid = [];
 
-    this.random = new Random(10235);
+    this.random = new Random(453636897);
     this.regenerate();
 }
 

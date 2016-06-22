@@ -14,12 +14,18 @@ function IslandGenerator(args) {
     this.zoom = 1;
     this.translationX = 0;
     this.translationY = 0;
-
+    this.boundingBox = {"x": 0, "y": 0, "width": args.width, "height": args.height};
+    this.drawingTasks = [];
 }
 
 IslandGenerator.LandType = Object.freeze({DEEP_WATER: "#0A0A14", SHALLOW_WATER: "#323246", LAND: "#64C864"});
 
 IslandGenerator.prototype.getLandType = function(x, y) {
+    x += this.translationX;
+    y += this.translationY;
+    x *= this.zoom;
+    y *= this.zoom;
+
     var dx = (x - this.centerX);
     var dy = (y - this.centerY);
     var distanceFromCenter = Math.sqrt(dx * dx + dy * dy);
@@ -45,15 +51,40 @@ IslandGenerator.prototype.getLandType = function(x, y) {
     }
     return null;
 }
+IslandGenerator.prototype.zoomAll = function(zoom) {
+    this.zoom *= zoom;
+    this.boundingBox.x *= zoom;
+    this.boundingBox.y *= zoom;
+    this.boundingBox.width *= zoom;
+    this.boundingBox.height *= zoom;
+}
+IslandGenerator.prototype.translateX = function(dx) {
+    this.boundingBox.x += dx;
+    this.translationX += dx;
+}
 
+IslandGenerator.prototype.translateY = function(dy) {
+    this.boundingBox.y += dy;
+    this.translationY += dy;
+}
+IslandGenerator.prototype.stopDrawing = function() {
+    for (var i = 0; i < this.drawingTasks.length; i++){
+        clearTimeout(this.drawingTasks[i]);
+    }
+}
 IslandGenerator.prototype.draw = function(ctx, onDone) {
+    
     var cellWidth = 10;
     var cellHeight = 10;
     this.scout(ctx, cellWidth, cellHeight, function(cellTypes) {
         var cellsDrawn = 0;
+        var minX = this.boundingBox.x;
+        var maxX = this.boundingBox.x + this.boundingBox.width;
+        var minY = this.boundingBox.y;
+        var minY = this.boundingBox.y + this.boundingBox.height;
         for (var cellY = 0; cellY < cellTypes.length; cellY++) {
             for (var cellX = 0; cellX < cellTypes[cellY].length; cellX++) {
-                setTimeout((function(cellY, cellX) {
+                var drawingTask = setTimeout((function(cellY, cellX) {
                     return function() {
                         var color1 = cellTypes[cellY][cellX]
                         
@@ -77,6 +108,12 @@ IslandGenerator.prototype.draw = function(ctx, onDone) {
                         }
                         
                         if (color1 != color2 || color1 != color3 || color1 != color4) {
+                            if (minX > cellX * cellWidth) {
+                                minX = cellX * cellWidth;
+                            }
+                            if (minY > cellY * cellHeight) {
+                                minY = cellY * cellHeight;
+                            }
                             for (var x = cellX * cellWidth; x < cellX * cellWidth + cellWidth; x++) {
                                 for (var y = cellY * cellHeight; y < cellY * cellHeight + cellHeight; y++) {
                                     ctx.fillStyle = this.getLandType(x, y);
@@ -88,11 +125,12 @@ IslandGenerator.prototype.draw = function(ctx, onDone) {
                             //ctx.fillRect(cellX * cellWidth, cellY * cellHeight, cellWidth, cellHeight);
                         }
                         cellsDrawn++;
-                        if (cellsDrawn >= cellTypes.length * cellTypes[0].length) {
+                        if (cellsDrawn >= cellTypes.length * cellTypes[0].length && onDone != null) {
                             onDone();
                         }
                     }.bind(this);
                 }.bind(this))(cellY, cellX), 0);
+                this.drawingTasks.push(drawingTask);
                 
             }
         }
@@ -108,7 +146,7 @@ IslandGenerator.prototype.scout = function(ctx, cellWidth, cellHeight, onDone) {
     for (var cellY = 0; cellY < gridHeight; cellY++) {
         cellTypes.push([]);
         for (var cellX = 0; cellX < gridWidth; cellX++) {
-            setTimeout((function(cellY, cellX) {
+            var drawingTask = setTimeout((function(cellY, cellX) {
                 return function() {
                     var x = cellWidth * cellX;
                     var y = cellHeight * cellY;
@@ -122,6 +160,7 @@ IslandGenerator.prototype.scout = function(ctx, cellWidth, cellHeight, onDone) {
                     }
                 }.bind(this);
             }.bind(this))(cellY, cellX), 0);
+            this.drawingTasks.push(drawingTask);
 
         }
     }

@@ -16,8 +16,35 @@ window.addEventListener('load', function() {
 
     var island_generator = new IslandGenerator({"width": canvas.width, "height": canvas.height});
     island_generator.draw(ctx, function() {
+        window.addEventListener('keydown', function(e) {
+            var speed = 100;
+            switch (e.keyCode) {
+                case 38: //up
+                    island_generator.translateY(-speed);
+                    break;
+                case 40: //down
+                    island_generator.translateY(speed);
+                    break;
+                case 37: //left
+                    island_generator.translateX(-speed);
+                    break;
+                case 39: //right
+                    island_generator.translateX(speed);
+                    break;
+                case 90: //z
+                    island_generator.zoomAll(0.9);
+                    break;
+                case 88: //x
+                    island_generator.zoomAll(1.1);
+                    break;
+            }
+            console.log(e.keyCode);
+            island_generator.stopDrawing();
+            island_generator.draw(ctx);
+        }, false);
         console.log("done!");
     });
+    
 }, false);
 
 function fade(x) {
