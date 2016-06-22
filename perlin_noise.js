@@ -5,6 +5,7 @@ function PerlinNoise(args) {
     this.cellHeight = 1.1;
     this.grid = [];
 
+    this.random = new Random(10235);
     this.regenerate();
 }
 
@@ -27,7 +28,7 @@ PerlinNoise.prototype.regenerate = function() {
         this.grid.push([]);
         for (var j = 0; j < arrayWidth; j++) {
             var gradient = new Vector();
-            var vals = [Math.random() * 2 * this.cellWidth - this.cellWidth, Math.random() * 2 * this.cellHeight - this.cellHeight];
+            var vals = [this.random.next() * 2 * this.cellWidth - this.cellWidth, this.random.next() * 2 * this.cellHeight - this.cellHeight];
             gradient.set(vals);
             this.grid[i].push(gradient);
         }

@@ -9,8 +9,12 @@ function IslandGenerator(args) {
                   };
     this.centerX = args.width / 2;
     this.centerY = args.height / 2;
-    this.zoom = 2;
+    this.noise = 0.901;
     this.maxDistance = Math.min(args.width, args.height) / 2;
+    this.zoom = 1;
+    this.translationX = 0;
+    this.translationY = 0;
+
 }
 
 IslandGenerator.LandType = Object.freeze({DEEP_WATER: "#0A0A14", SHALLOW_WATER: "#323246", LAND: "#64C864"});
@@ -23,11 +27,14 @@ IslandGenerator.prototype.getLandType = function(x, y) {
     if (distanceFromCenter >= this.maxDistance) {
         noise = 0;
     } else {
-        noise = (this.perlin.getIntensityAt(x / (4 * this.zoom), y / (4 * this.zoom)) / 50 + 1) *
-                (this.perlin.getIntensityAt(x / (20 * this.zoom), y / (20 * this.zoom)) / 10 + 1) *
-                (this.perlin.getIntensityAt(x / (100 * this.zoom), y / (100 * this.zoom)) + 1) *
-                (this.perlin.getIntensityAt(x / (200 * this.zoom), y / (200 * this.zoom)) + 1) *
-                IslandGenerator.fade((this.maxDistance - distanceFromCenter) / this.maxDistance);
+        noise = (this.perlin.getIntensityAt(x / (4 * this.noise), y / (4 * this.noise)) / 50 + 1) *
+                (this.perlin.getIntensityAt(x / (20 * this.noise), y / (20 * this.noise)) / 10 + 1) *
+                (this.perlin.getIntensityAt(x / (100 * this.noise), y / (100 * this.noise)) + 1) *
+                (this.perlin.getIntensityAt(x / (200 * this.noise), y / (200 * this.noise)) / 1.5 + 1) *
+                (this.perlin.getIntensityAt(x / (1000 * this.noise), y / (1000 * this.noise)) + 1);
+        noise *= 1.2 * (this.maxDistance - distanceFromCenter) / this.maxDistance;
+        noise +=  0.1;
+        //noise *= IslandGenerator.fade((this.maxDistance - distanceFromCenter) / this.maxDistance);
     }
 
     for (var key in this.ranges) {
@@ -40,8 +47,8 @@ IslandGenerator.prototype.getLandType = function(x, y) {
 }
 
 IslandGenerator.prototype.draw = function(ctx, onDone) {
-    var cellWidth = 20;
-    var cellHeight = 20;
+    var cellWidth = 10;
+    var cellHeight = 10;
     this.scout(ctx, cellWidth, cellHeight, function(cellTypes) {
         var cellsDrawn = 0;
         for (var cellY = 0; cellY < cellTypes.length; cellY++) {
@@ -121,7 +128,9 @@ IslandGenerator.prototype.scout = function(ctx, cellWidth, cellHeight, onDone) {
 }
 
 IslandGenerator.fade = function(x) {
-    var result = - Math.pow((- Math.cos(Math.PI * (x - 1)) / 2.0 + 0.5), 20) + 1;
+    //var result = Math.cos(Math.PI * x -  Math.PI) * 0.5 + 0.5
+    //console.log(result);
+    var result = - Math.pow((- Math.cos(Math.PI * (x - 1)) / 2.0 + 0.5), 200) + 1;
     return result;
 }
 
