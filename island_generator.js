@@ -20,7 +20,7 @@ function IslandGenerator(args) {
 
 IslandGenerator.LandType = Object.freeze({DEEP_WATER: "#0A0A14", SHALLOW_WATER: "#323246", LAND: "#64C864"});
 
-IslandGenerator.prototype.getLandType = function(x, y) {
+IslandGenerator.prototype.getHeightAt = function(x, y) {
     x += this.translationX;
     y += this.translationY;
     x *= this.zoom;
@@ -42,7 +42,11 @@ IslandGenerator.prototype.getLandType = function(x, y) {
         noise +=  0.1;
         //noise *= IslandGenerator.fade((this.maxDistance - distanceFromCenter) / this.maxDistance);
     }
-
+    return noise;
+}
+IslandGenerator.prototype.getLandType = function(x, y) {
+    var noise = this.getHeightAt(x, y);
+    
     for (var key in this.ranges) {
         var range = this.ranges[key];
         if (range.low <= noise && noise < range.high) {

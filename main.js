@@ -15,6 +15,16 @@ window.addEventListener('load', function() {
     //draw();
 
     var island_generator = new IslandGenerator({"width": canvas.width, "height": canvas.height});
+    for (var x = 0; x < canvas.width; x += 10) {
+        for (var y = 0; y < canvas.height; y += 10) {
+            
+            var height = Math.round(island_generator.getHeightAt(x, y) * 255);
+            ctx.fillStyle = IslandGenerator.rgbToHex(height, height, height);
+            ctx.fillRect(x, y, 20, 20);
+        }
+    }
+    
+    /*
     island_generator.draw(ctx, function() {
         window.addEventListener('keydown', function(e) {
             var speed = 100;
@@ -44,7 +54,7 @@ window.addEventListener('load', function() {
         }, false);
         console.log("done!");
     });
-    
+    */
 }, false);
 
 function fade(x) {
