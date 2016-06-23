@@ -1,15 +1,15 @@
 function IslandGenerator(args) {
-    this.perlin = new PerlinNoise(args);
+    this.perlin = new PerlinNoise({"width": args.width * 2, "height": args.height * 2});
     this.width = args.width;
     this.height = args.height;
     this.ranges = {
                    DEEP_WATER: {low: 0, high: 0.90},
-                   SHALLOW_WATER: {low: 0.90, high: 1},
-                   LAND: {low: 1, high: Number.POSITIVE_INFINITY}
+                   SHALLOW_WATER: {low: 0.90, high: 1.5},
+                   LAND: {low: 1.5, high: Number.POSITIVE_INFINITY}
                   };
     this.centerX = args.width / 2;
     this.centerY = args.height / 2;
-    this.noise = 0.901;
+    this.noise = 0.7;
     this.maxDistance = Math.min(args.width, args.height) / 2;
     this.zoom = 1;
     this.translationX = 0;
@@ -33,13 +33,27 @@ IslandGenerator.prototype.getHeightAt = function(x, y) {
     if (distanceFromCenter >= this.maxDistance) {
         noise = 0;
     } else {
-        noise = (this.perlin.getIntensityAt(x / (4 * this.noise), y / (4 * this.noise)) / 50 + 1) *
-                (this.perlin.getIntensityAt(x / (20 * this.noise), y / (20 * this.noise)) / 10 + 1) *
-                (this.perlin.getIntensityAt(x / (100 * this.noise), y / (100 * this.noise)) + 1) *
-                (this.perlin.getIntensityAt(x / (200 * this.noise), y / (200 * this.noise)) / 1.5 + 1) *
-                (this.perlin.getIntensityAt(x / (1000 * this.noise), y / (1000 * this.noise)) + 1);
-        noise *= 1.2 * (this.maxDistance - distanceFromCenter) / this.maxDistance;
-        noise +=  0.1;
+        noise = 1;
+        var wavelength = 1000;
+        var amplitude = 8;
+        for (var i = 0; i < 11; i++) {
+            noise *= this.perlin.getIntensityAt(x / (wavelength * this.noise), y / ((wavelength) * this.noise)) * amplitude + 1;
+            wavelength /= 2;
+            amplitude /= 2;
+        }
+                /*
+                (this.perlin.getIntensityAt(x / (0.6 * this.noise), y / (0.6 * this.noise)) / 64 + 1) *
+                (this.perlin.getIntensityAt(x / (1.5 * this.noise), y / (1.5 * this.noise)) / 64 + 1) *
+                (this.perlin.getIntensityAt(x / (3 * this.noise), y / (3 * this.noise)) / 32 + 1) *
+                (this.perlin.getIntensityAt(x / (4 * this.noise), y / (4 * this.noise)) / 8 + 1) *
+                (this.perlin.getIntensityAt(x / (20 * this.noise), y / (20 * this.noise)) / 2 + 1) *
+                (this.perlin.getIntensityAt(x / (100 * this.noise), y / (100 * this.noise)) / 1 + 1) *
+                (this.perlin.getIntensityAt(x / (300 * this.noise), y / (300 * this.noise)) * 2 + 1) *
+                (this.perlin.getIntensityAt(x / (500 * this.noise), y / (500 * this.noise)) * 4 + 1) *
+                (this.perlin.getIntensityAt(x / (1000 * this.noise), y / (1000 * this.noise)) * 8 + 1);
+                */
+        noise *= (this.maxDistance - distanceFromCenter) / this.maxDistance;
+        //noise +=  -0.1;
         //noise *= IslandGenerator.fade((this.maxDistance - distanceFromCenter) / this.maxDistance);
     }
     return noise;
@@ -173,7 +187,7 @@ IslandGenerator.prototype.scout = function(ctx, cellWidth, cellHeight, onDone) {
 IslandGenerator.fade = function(x) {
     //var result = Math.cos(Math.PI * x -  Math.PI) * 0.5 + 0.5
     //console.log(result);
-    var result = - Math.pow((- Math.cos(Math.PI * (x - 1)) / 2.0 + 0.5), 200) + 1;
+    var result = - Math.pow((- Math.cos(Math.PI * (x - 1)) / 2.0 + 0.5), 50) + 1;
     return result;
 }
 

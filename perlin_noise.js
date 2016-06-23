@@ -5,7 +5,7 @@ function PerlinNoise(args) {
     this.cellHeight = 1.1;
     this.grid = [];
 
-    this.random = new Random(453636897);
+    this.random = new Random((new Date()).getTime());
     this.regenerate();
 }
 
@@ -31,6 +31,14 @@ PerlinNoise.prototype.regenerate = function() {
             var vals = [this.random.next() * 2 * this.cellWidth - this.cellWidth, this.random.next() * 2 * this.cellHeight - this.cellHeight];
             gradient.set(vals);
             this.grid[i].push(gradient);
+        }
+    }
+}
+
+PerlinNoise.prototype.getGradientAt = function(cellY, cellX) {
+    if (cellY >= this.grid.length) {
+        for (var y = this.grid.length; y < this.cellY; y++) {
+            
         }
     }
 }
