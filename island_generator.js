@@ -41,23 +41,28 @@ IslandGenerator.prototype.getHeightAt = function(x, y) {
             wavelength /= 2;
             amplitude /= 2;
         }
-                /*
-                (this.perlin.getIntensityAt(x / (0.6 * this.noise), y / (0.6 * this.noise)) / 64 + 1) *
-                (this.perlin.getIntensityAt(x / (1.5 * this.noise), y / (1.5 * this.noise)) / 64 + 1) *
-                (this.perlin.getIntensityAt(x / (3 * this.noise), y / (3 * this.noise)) / 32 + 1) *
-                (this.perlin.getIntensityAt(x / (4 * this.noise), y / (4 * this.noise)) / 8 + 1) *
-                (this.perlin.getIntensityAt(x / (20 * this.noise), y / (20 * this.noise)) / 2 + 1) *
-                (this.perlin.getIntensityAt(x / (100 * this.noise), y / (100 * this.noise)) / 1 + 1) *
-                (this.perlin.getIntensityAt(x / (300 * this.noise), y / (300 * this.noise)) * 2 + 1) *
-                (this.perlin.getIntensityAt(x / (500 * this.noise), y / (500 * this.noise)) * 4 + 1) *
-                (this.perlin.getIntensityAt(x / (1000 * this.noise), y / (1000 * this.noise)) * 8 + 1);
-                */
         noise *= (this.maxDistance - distanceFromCenter) / this.maxDistance;
         //noise +=  -0.1;
         //noise *= IslandGenerator.fade((this.maxDistance - distanceFromCenter) / this.maxDistance);
     }
     return noise;
 }
+
+IslandGenerator.prototype.zoomInToBox = function(args) {
+    var x = args.x;
+    var y = args.y;
+    var width = args.width;
+    var height = args.height;
+    var maxZoomDimension = Math.max(width, height);
+    if (maxZoomDimension == width) {
+        this.zoomAll(maxZoomDimension / this.width);
+    } else {
+        this.zoomAll(maxZoomDimension / this.height);
+    }
+    this.translateX(x);
+    this.translateY(-(y + maxZoomDimension) * this.zoom);
+}
+
 IslandGenerator.prototype.getLandType = function(x, y) {
     var noise = this.getHeightAt(x, y);
     
@@ -70,7 +75,10 @@ IslandGenerator.prototype.getLandType = function(x, y) {
     return null;
 }
 IslandGenerator.prototype.zoomAll = function(zoom) {
+    console.log(zoom);
     this.zoom *= zoom;
+    this.translationX /= zoom;
+    this.translationY /= zoom;
     this.boundingBox.x *= zoom;
     this.boundingBox.y *= zoom;
     this.boundingBox.width *= zoom;

@@ -62,7 +62,29 @@ window.addEventListener('load', function() {
             island_generator.stopDrawing();
             island_generator.draw(ctx);
         }, false);
+        var mouseDown = false;
+
+        var downX = null;
+        var downY = null;
+
+        window.addEventListener('mousedown', function(e) {
+            mouseDown = true;
+            downX = e.x;
+            downY = e.y;
+        }, false);
+        window.addEventListener('mouseup', function(e) {
+            mouseDown = false;
+            island_generator.zoomInToBox({"x": downX, "y": downY, "width": Math.abs(downX - e.x), "height": Math.abs(downY - e.y)});
+            island_generator.stopDrawing();
+            island_generator.draw(ctx);
+        }, false);
+
         console.log("done!");
+        /*
+        window.setTimeout(function() {
+
+        }, 1000);
+        */
     });
 }, false);
 
@@ -70,7 +92,6 @@ function fade(x) {
     var result = - Math.pow((- Math.cos(Math.PI * (x - 1)) / 2.0 + 0.5), 20) + 1;
     return result;
 }
-
 
 /*
 window.addEventListener('resize', function() {
